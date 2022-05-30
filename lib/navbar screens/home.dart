@@ -21,7 +21,7 @@ class _HomeState extends State<Home> {
       backgroundColor: colorWhite,
       drawer: MenuDrawer(),
       appBar: AppBar(
-        title: const Text('Dzaubry', style: TextStyle( color: primaryColor, fontSize: 24),),
+        title: const Text('Dzuabry', style: TextStyle( color: primaryColor, fontSize: 24),),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -151,9 +151,10 @@ class _HomeState extends State<Home> {
                                         ),
                                         Row(
                                           children: [
-                                            Icon(Icons.thumb_down_alt_outlined),
+                                            Icon(Icons.arrow_upward),
+                                            Icon(Icons.arrow_downward),
                                             SizedBox(width: 5,),
-                                            Text("32", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                            Text("Votar", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
                                           ],
                                         ),
                                         Row(
@@ -241,9 +242,10 @@ class _HomeState extends State<Home> {
                                         ),
                                         Row(
                                           children: [
-                                            Icon(Icons.thumb_down_alt_outlined),
+                                            Icon(Icons.arrow_upward),
+                                            Icon(Icons.arrow_downward),
                                             SizedBox(width: 5,),
-                                            Text("32", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                            Text("Votar", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
                                           ],
                                         ),
                                         Row(
@@ -331,9 +333,10 @@ class _HomeState extends State<Home> {
                                         ),
                                         Row(
                                           children: [
-                                            Icon(Icons.thumb_down_alt_outlined),
+                                            Icon(Icons.arrow_upward),
+                                            Icon(Icons.arrow_downward),
                                             SizedBox(width: 5,),
-                                            Text("32", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                            Text("Votar", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
                                           ],
                                         ),
                                         Row(

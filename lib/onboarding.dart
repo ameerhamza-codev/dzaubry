@@ -39,11 +39,11 @@ class OnBoarding extends StatelessWidget {
                         color: Colors.black,
                       ),
                       children: <TextSpan>[
-                         TextSpan(text:"Obtén todas las novedades y actualizaciones que quieras desde el compafot de tu hogar con", style: TextStyle(
+                         TextSpan(text:"Obtén todas las novedades y actualizaciones que quieras desde el confort de tu hogar con", style: TextStyle(
                           color: secondaryColor,
                           fontSize: 20,
                         ),),
-                         TextSpan(text: ' Dzaubry', style: TextStyle(
+                         TextSpan(text: ' Dzuabry', style: TextStyle(
                           color: secondaryColor,
                           fontSize: 28,
                         ),),

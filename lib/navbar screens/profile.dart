@@ -21,7 +21,7 @@ class _ProfileState extends State<Profile> {
       backgroundColor: colorWhite,
       drawer: MenuDrawer(),
       appBar: AppBar(
-        title: const Text('Dzaubry', style: TextStyle( color: primaryColor, fontSize: 24),),
+        title: const Text('Dzuabry', style: TextStyle( color: primaryColor, fontSize: 24),),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -176,7 +176,7 @@ class _ProfileState extends State<Profile> {
             ),
             SizedBox(height: 10,),
             Container(
-              height: 150,
+              height: 250,
               width: width*0.20,
               decoration: BoxDecoration(
                   border: Border.all(color: colorBlack,)
@@ -212,7 +212,28 @@ class _ProfileState extends State<Profile> {
                       children: [
                         FaIcon(FontAwesomeIcons.locationDot,color: primaryColor,size: 20,),
                         SizedBox(width: 15,),
-                        Text("Agregar direccion",style: TextStyle(fontSize:16, fontWeight:FontWeight.w500, color: colorBlack),),
+                        Text("Agregar lugar de residencia",style: TextStyle(fontSize:16, fontWeight:FontWeight.w500, color: colorBlack),),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        FaIcon(FontAwesomeIcons.locationDot,color: primaryColor,size: 20,),
+                        SizedBox(width: 15,),
+                        Text("Agregar lugar de origen",style: TextStyle(fontSize:16, fontWeight:FontWeight.w500, color: colorBlack),),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        FaIcon(FontAwesomeIcons.bookOpen,color: primaryColor,size: 20,),
+                        SizedBox(width: 15,),
+                        Text("Agregar pasatiempo",style: TextStyle(fontSize:16, fontWeight:FontWeight.w500, color: colorBlack),),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        FaIcon(FontAwesomeIcons.contactCard,color: primaryColor,size: 20,),
+                        SizedBox(width: 15,),
+                        Text("Agregar informacion de contacto",style: TextStyle(fontSize:16, fontWeight:FontWeight.w500, color: colorBlack),),
                       ],
                     ),
 

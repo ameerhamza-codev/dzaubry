@@ -19,7 +19,7 @@ class _AddPostState extends State<AddPost> {
       backgroundColor: colorWhite,
       drawer: MenuDrawer(),
       appBar: AppBar(
-        title: const Text('Dzaubry', style: TextStyle( color: primaryColor, fontSize: 24),),
+        title: const Text('Dzuabry', style: TextStyle( color: primaryColor, fontSize: 24),),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -99,7 +99,7 @@ class _AddPostState extends State<AddPost> {
               children: [
                 FaIcon(FontAwesomeIcons.upload,color: primaryColor,size: 15,),
                 SizedBox(width: 9,),
-                Text("Agregar contenido de imagen/video/audio",style: TextStyle(fontSize:16, fontWeight:FontWeight.w500, color: colorBlack),),
+                Text("Agregar contenido de imagen/video/pódcast",style: TextStyle(fontSize:14, fontWeight:FontWeight.w500, color: colorBlack),),
               ],
             ),
             SizedBox(height: 30,),

@@ -74,7 +74,7 @@ class _InterestState extends State<Interest> {
                         color: primaryColor
                     ),
                     alignment: Alignment.center,
-                    child: const Text("Deportivo",style: TextStyle(fontSize:18,color: colorWhite),),
+                    child: const Text("Deportes",style: TextStyle(fontSize:18,color: colorWhite),),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 58.0),
@@ -130,19 +130,19 @@ class _InterestState extends State<Interest> {
                       border: Border.all(color: colorBlack)
                     ),
                     alignment: Alignment.center,
-                    child: const Text("Víveres",style: TextStyle(fontSize:18,color: colorBlack),),
+                    child: const Text("Locales",style: TextStyle(fontSize:18,color: colorBlack),),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 58.0),
                     child: Container(
                       height: 50,
-                      width: width*0.30,
+                      width: width*0.45,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
                           color: primaryColor
                       ),
                       alignment: Alignment.center,
-                      child: const Text("Fútbol",style: TextStyle(fontSize:18,color: colorWhite),),
+                      child: const Text("Eventos sociales",style: TextStyle(fontSize:18,color: colorWhite),),
                     ),
                   ),
                 ],

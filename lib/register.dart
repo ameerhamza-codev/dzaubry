@@ -57,7 +57,7 @@ class _RegisterState extends State<Register> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15.0),
                         ),
-                        hintText: 'El Nombre de familia',
+                        hintText: 'Apellido',
                         fillColor: colorWhite,
                         filled: true,
 
