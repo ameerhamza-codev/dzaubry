@@ -14,6 +14,7 @@ class _AddPostState extends State<AddPost> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    Size _size= MediaQuery.of(context).size;
 
     return Scaffold(
       backgroundColor: colorWhite,
@@ -37,7 +38,7 @@ class _AddPostState extends State<AddPost> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: _size.width> 756 ? EdgeInsets.symmetric(horizontal: width*0.2):EdgeInsets.all(15.0),
         child: ListView(
           children: [
 
@@ -50,7 +51,7 @@ class _AddPostState extends State<AddPost> {
                 Text("De qué quieres hablar?", style: TextStyle(color: colorBlack, fontSize: 14, fontWeight: FontWeight.w600),),
                 Container(
                   height: 30,
-                  width: width*0.40,
+                  width: _size.width> 756 ? width*0.2:width*0.40,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
                       border: Border.all(color: colorBlack,)
@@ -105,7 +106,7 @@ class _AddPostState extends State<AddPost> {
             SizedBox(height: 30,),
             Container(
               height: 40,
-              width: width*0.7,
+              width: _size.width> 756 ? width*0.4:width*0.7,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   border: Border.all(color: colorBlack)
@@ -116,7 +117,7 @@ class _AddPostState extends State<AddPost> {
             SizedBox(height: 20,),
             Container(
               height: 40,
-              width: width*0.7,
+              width: _size.width> 756 ? width*0.4:width*0.7,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   border: Border.all(color: colorBlack)

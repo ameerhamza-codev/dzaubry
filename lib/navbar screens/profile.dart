@@ -16,6 +16,7 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    Size _size= MediaQuery.of(context).size;
 
     return Scaffold(
       backgroundColor: colorWhite,
@@ -39,7 +40,7 @@ class _ProfileState extends State<Profile> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: _size.width> 756 ? EdgeInsets.symmetric(horizontal: width*0.2):EdgeInsets.all(15.0),
         child: ListView(
           children: [
             Column(
@@ -89,7 +90,7 @@ class _ProfileState extends State<Profile> {
               children: [
                 Container(
                   height: 90,
-                  width: width*0.20,
+                  width:  _size.width> 756 ? width*0.1 : width*0.20,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
                     color: primaryColor
@@ -106,7 +107,7 @@ class _ProfileState extends State<Profile> {
                 ),
                 Container(
                   height: 90,
-                  width: width*0.20,
+                  width:  _size.width> 756 ? width*0.1 : width*0.20,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
                       color: primaryColor
@@ -123,7 +124,7 @@ class _ProfileState extends State<Profile> {
                 ),
                 Container(
                   height: 90,
-                  width: width*0.20,
+                  width:  _size.width> 756 ? width*0.1 : width*0.20,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
                       color: primaryColor
@@ -140,7 +141,7 @@ class _ProfileState extends State<Profile> {
                 ),
                 Container(
                   height: 90,
-                  width: width*0.20,
+                  width:  _size.width> 756 ? width*0.1 : width*0.20,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
                       color: primaryColor

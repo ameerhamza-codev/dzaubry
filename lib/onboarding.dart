@@ -8,6 +8,7 @@ class OnBoarding extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    Size _size= MediaQuery.of(context).size;
 
     return Stack(
       children: [
@@ -58,7 +59,7 @@ class OnBoarding extends StatelessWidget {
                   },
                   child: Container(
                     height: 50,
-                    width: width*0.35,
+                    width: _size.width> 756? width*0.2:width*0.35,
                     decoration: BoxDecoration(
                       color: primaryColor,
                       borderRadius: BorderRadius.circular(5),

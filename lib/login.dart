@@ -21,6 +21,7 @@ class _LoginState extends State<Login> {
 
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+    Size _size= MediaQuery.of(context).size;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -30,7 +31,7 @@ class _LoginState extends State<Login> {
           children: [
             Container(
               child: Padding(
-                padding: const EdgeInsets.all(15.0),
+                padding: _size.width> 756 ? EdgeInsets.symmetric(horizontal: width*0.2):EdgeInsets.all(15.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -117,7 +118,7 @@ class _LoginState extends State<Login> {
                         },
                         child: Container(
                           height: 40,
-                          width: width*0.8,
+                          width: _size.width> 756? width*0.4:width*0.8,
                           decoration: BoxDecoration(
                             color: primaryColor,
                             borderRadius: BorderRadius.circular(15),

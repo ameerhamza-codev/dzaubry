@@ -16,6 +16,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    Size _size= MediaQuery.of(context).size;
 
     return Scaffold(
       backgroundColor: colorWhite,
@@ -39,7 +40,7 @@ class _HomeState extends State<Home> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: _size.width> 756 ? EdgeInsets.symmetric(horizontal: width*0.15):EdgeInsets.all(15.0),
         child: ListView(
           children: [
             TextField(
@@ -72,7 +73,7 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   Container(
-                      height: 500, //height of TabBarView
+                      height: _size.width> 756 ? _size.height-50: 500, //height of TabBarView
                       decoration: BoxDecoration(
                           border: Border(top: BorderSide(color: Colors.grey, width: 0.5))
                       ),
@@ -107,7 +108,7 @@ class _HomeState extends State<Home> {
                                     ),
                                     SizedBox(height: 10,),
                                     Container(
-                                      height: 200,
+                                      height: _size.width> 756 ? 400 : 200, //height of TabBarView
                                       width: width*0.9,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(15),
@@ -137,10 +138,10 @@ class _HomeState extends State<Home> {
                                         child: const Text("leer",style: TextStyle(fontSize:18,color: colorBlack),),
                                       ),
                                     ),
-                                    SizedBox(height: 20,),
+                                    SizedBox(height: 40,),
 
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Row(
                                           children: [
@@ -198,7 +199,7 @@ class _HomeState extends State<Home> {
                                     ),
                                     SizedBox(height: 10,),
                                     Container(
-                                      height: 200,
+                                      height: _size.width> 756 ? 400 : 200, //height of TabBarView
                                       width: width*0.9,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(15),
@@ -228,10 +229,10 @@ class _HomeState extends State<Home> {
                                         child: const Text("leer",style: TextStyle(fontSize:18,color: colorBlack),),
                                       ),
                                     ),
-                                    SizedBox(height: 20,),
+                                    SizedBox(height: 40,),
 
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Row(
                                           children: [
@@ -289,7 +290,7 @@ class _HomeState extends State<Home> {
                                     ),
                                     SizedBox(height: 10,),
                                     Container(
-                                      height: 200,
+                                      height: _size.width> 756 ? 400 : 200, //height of TabBarView
                                       width: width*0.9,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(15),
@@ -319,10 +320,10 @@ class _HomeState extends State<Home> {
                                         child: const Text("leer",style: TextStyle(fontSize:18,color: colorBlack),),
                                       ),
                                     ),
-                                    SizedBox(height: 20,),
+                                    SizedBox(height: 40,),
 
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Row(
                                           children: [

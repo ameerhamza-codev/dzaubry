@@ -16,13 +16,14 @@ class _InterestState extends State<Interest> {
 
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+    Size _size= MediaQuery.of(context).size;
 
     return Scaffold(
       backgroundColor: secondaryColor,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(15.0),
+          padding: _size.width> 756 ? EdgeInsets.symmetric(horizontal: width*0.2):EdgeInsets.all(15.0),
           child: ListView(
             children: [
               const SizedBox(height: 10,),
@@ -68,7 +69,7 @@ class _InterestState extends State<Interest> {
                 children: [
                   Container(
                     height: 50,
-                    width: width*0.45,
+                    width: _size.width> 756 ? width*0.3: width*0.45,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
                         color: primaryColor
@@ -80,7 +81,7 @@ class _InterestState extends State<Interest> {
                     padding: const EdgeInsets.only(top: 58.0),
                     child: Container(
                       height: 50,
-                      width: width*0.40,
+                      width: _size.width> 756 ? width*0.25: width*0.40,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
                           color: primaryColor
@@ -96,7 +97,7 @@ class _InterestState extends State<Interest> {
                 children: [
                   Container(
                     height: 50,
-                    width: width*0.38,
+                    width: _size.width> 756 ? width*0.22: width*0.38,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
                         color: primaryColor
@@ -108,7 +109,7 @@ class _InterestState extends State<Interest> {
                     padding: const EdgeInsets.only(top: 58.0),
                     child: Container(
                       height: 50,
-                      width: width*0.52,
+                      width: _size.width> 756 ? width*0.38: width*0.52,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
                           color: primaryColor
@@ -124,7 +125,7 @@ class _InterestState extends State<Interest> {
                 children: [
                   Container(
                     height: 50,
-                    width: width*0.40,
+                    width: _size.width> 756 ? width*0.3: width*0.40,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
                       border: Border.all(color: colorBlack)
@@ -136,7 +137,7 @@ class _InterestState extends State<Interest> {
                     padding: const EdgeInsets.only(top: 58.0),
                     child: Container(
                       height: 50,
-                      width: width*0.45,
+                      width: _size.width> 756 ? width*0.3: width*0.45,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
                           color: primaryColor
@@ -152,7 +153,7 @@ class _InterestState extends State<Interest> {
                 children: [
                   Container(
                     height: 50,
-                    width: width*0.55,
+                    width: _size.width> 756 ? width*0.4: width*0.55,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
                         color: primaryColor
@@ -164,7 +165,7 @@ class _InterestState extends State<Interest> {
                     padding: const EdgeInsets.only(top: 58.0),
                     child: Container(
                       height: 50,
-                      width: width*0.30,
+                      width: _size.width> 756 ? width*0.2: width*0.30,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
                           color: primaryColor
@@ -180,7 +181,7 @@ class _InterestState extends State<Interest> {
                 children: [
                   Container(
                     height: 50,
-                    width: width*0.40,
+                    width: _size.width> 756 ? width*0.3: width*0.40,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
                         color: primaryColor
@@ -192,7 +193,7 @@ class _InterestState extends State<Interest> {
                     padding: const EdgeInsets.only(top: 58.0),
                     child: Container(
                       height: 50,
-                      width: width*0.30,
+                      width: _size.width> 756 ? width*0.2: width*0.30,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
                           color: primaryColor
@@ -208,7 +209,7 @@ class _InterestState extends State<Interest> {
                 children: [
                   Container(
                     height: 50,
-                    width: width*0.45,
+                    width: _size.width> 756 ? width*0.3: width*0.45,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(color: colorBlack)
@@ -227,7 +228,7 @@ class _InterestState extends State<Interest> {
                 children: [
                   Container(
                     height: 50,
-                    width: width*0.20,
+                    width: _size.width> 756 ? width*0.15: width*0.20,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
                         color: primaryColor
@@ -239,7 +240,7 @@ class _InterestState extends State<Interest> {
                     padding: const EdgeInsets.only(top: 58.0),
                     child: Container(
                       height: 50,
-                      width: width*0.40,
+                      width: _size.width> 756 ? width*0.25: width*0.40,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
                           border: Border.all(color: colorBlack)
@@ -255,7 +256,7 @@ class _InterestState extends State<Interest> {
                 children: [
                   Container(
                     height: 50,
-                    width: width*0.35,
+                    width: _size.width> 756 ? width*0.2: width*0.35,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
                         color: primaryColor,

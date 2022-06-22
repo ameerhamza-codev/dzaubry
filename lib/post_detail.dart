@@ -15,6 +15,7 @@ class _PostDetailState extends State<PostDetail> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    Size _size= MediaQuery.of(context).size;
 
     return Scaffold(
       backgroundColor: colorWhite,
@@ -35,7 +36,7 @@ class _PostDetailState extends State<PostDetail> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+        padding: _size.width> 756 ? EdgeInsets.symmetric(horizontal: width*0.2):EdgeInsets.all(15.0),
         child: ListView(
           children: [
             Container(
@@ -46,7 +47,7 @@ class _PostDetailState extends State<PostDetail> {
                   Row(
                     children: [
                       Expanded(
-                        flex: 5,
+                        flex:  _size.width> 756? 6:5,
                         child: Row(
                           children: [
                             Image.asset("assets/icons/eu-news.png", height: 45, width: 45,),
@@ -56,12 +57,12 @@ class _PostDetailState extends State<PostDetail> {
                         ),
                       ),
                       Expanded(
-                        flex: 5,
+                          flex:  _size.width> 756? 4:5,
                         child: Row(
                           children: [
                             Container(
                               height: 30,
-                              width: width*0.2,
+                              width: _size.width> 756? width*0.1:width*0.2,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(5),
                                   color: primaryColor
@@ -72,7 +73,7 @@ class _PostDetailState extends State<PostDetail> {
                             SizedBox(width: 10,),
                             Container(
                               height: 30,
-                              width: width*0.2,
+                              width: _size.width> 756? width*0.1:width*0.2,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(5),
                                   border: Border.all(color: colorBlack)
@@ -91,7 +92,7 @@ class _PostDetailState extends State<PostDetail> {
                   SizedBox(height: 10,),
 
                   Container(
-                    height: 200,
+                    height: _size.width> 756 ? 400 : 200, //height of TabBarView
                     width: width*0.9,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
@@ -110,7 +111,7 @@ class _PostDetailState extends State<PostDetail> {
                   SizedBox(height: 10,),
                   Container(
                     height: 50,
-                    width: width*0.35,
+                    width: _size.width> 756? width*0.15:width*0.35,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
                         border: Border.all(color: colorBlack)
@@ -124,10 +125,10 @@ class _PostDetailState extends State<PostDetail> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 20,),
+                  SizedBox(height: 30,),
 
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
                         children: [
@@ -158,6 +159,7 @@ class _PostDetailState extends State<PostDetail> {
                   Text("Noticias relacionadas", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),),
                   SizedBox(height: 20,),
                   Container(
+                    width: _size.width> 756? width*0.3:width,
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Row(
@@ -198,6 +200,7 @@ class _PostDetailState extends State<PostDetail> {
                     ),
                   ),
                   Container(
+                    width: _size.width> 756? width*0.3:width,
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Row(
@@ -238,6 +241,7 @@ class _PostDetailState extends State<PostDetail> {
                     ),
                   ),
                   Container(
+                    width: _size.width> 756? width*0.3:width,
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Row(
