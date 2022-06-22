@@ -35,25 +35,11 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   font_awesome_flutter: ^10.1.0
-  firebase_auth: ^3.3.19
-  cloud_firestore: ^3.1.17
-  firebase_storage: ^10.2.12
-  firebase_messaging: ^11.2.13
-  firebase_core: ^1.14.1
-  bloc: ^8.0.3
-  provider: ^6.0.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: "^0.9.3"
-  #flutter packages pub run build_runner build --delete-conflicting-outputs
 
-flutter_icons:
-  android: "launcher_icon"
-  ios: true
-  remove_alpha_ios: true
-  image_path: "assets/images/logo.png"
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

@@ -1,4 +1,4 @@
-package com.codev.dzaubrynewspaper
+package com.codev.dzaubry_newspaper
 
 import io.flutter.embedding.android.FlutterActivity
 
