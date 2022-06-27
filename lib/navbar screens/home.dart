@@ -1,8 +1,11 @@
-import 'package:dzaubry_newspaper/navbar%20screens/profile.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dzaubry_newspaper/models/post_model.dart';
 import 'package:dzaubry_newspaper/navbar%20screens/sidemenu.dart';
 import 'package:dzaubry_newspaper/post_detail.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../provider/userdataprovider.dart';
 import '../utils/constants.dart';
 
 class Home extends StatefulWidget {
@@ -13,10 +16,13 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     Size _size= MediaQuery.of(context).size;
+    final provider = Provider.of<UserDataProvider>(context, listen: false);
 
     return Scaffold(
       backgroundColor: colorWhite,
@@ -82,296 +88,563 @@ class _HomeState extends State<Home> {
                           child:
                           ListView(
                             children: [
-                              Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 20,),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 6,
-                                          child: Row(
-                                            children: [
-                                              Image.asset("assets/icons/eu-news.png", height: 45, width: 45,),
-                                              Text(" E.U News ", style: TextStyle(fontWeight: FontWeight.bold),),
-                                              Image.asset("assets/icons/verified.png", height: 15, width: 15,),
-                                            ],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 4,
-                                          child: Text("11:45 AM", textAlign: TextAlign.right, style: TextStyle(fontWeight: FontWeight.bold),),
-                                        )
+                              StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance.collection('posts')
+                                    .snapshots(),
+                                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Center(child: Text('Something went wrong'));
+                                  }
 
-                                      ],
-                                    ),
-                                    SizedBox(height: 10,),
-                                    Container(
-                                      height: _size.width> 756 ? 400 : 200, //height of TabBarView
-                                      width: width*0.9,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(15),
-                                        image: DecorationImage(
-                                          image: AssetImage("assets/images/car.png"),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+                                  if (snapshot.data!.size==0) {
+                                    return Center(child: Text('No Posts'));
+                                  }
+                                  return ListView(
+                                    shrinkWrap: true,
+                                    padding: EdgeInsets.all(20),
 
-                                    ),
-                                    SizedBox(height: 10,),
-                                    Text("El presidente Hernández visita la UE", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),),
+                                    children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                                      Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+                                      PostModel story=PostModel.fromMap(data, document.reference.id);
 
-                                    SizedBox(height: 10,),
-                                    InkWell(
-                                      onTap: (){
-                                        Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => PostDetail()));
-                                      },
-                                      child: Container(
-                                        height: 30,
-                                        width: width*0.15,
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
-                                            border: Border.all(color: colorBlack)
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: const Text("leer",style: TextStyle(fontSize:18,color: colorBlack),),
-                                      ),
-                                    ),
-                                    SizedBox(height: 40,),
-
-                                    Row(
-                                      mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
+                                      return Container(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Icon(Icons.thumb_up_alt_outlined),
-                                            SizedBox(width: 5,),
-                                            Text("98", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                            SizedBox(height: 20,),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  flex: 6,
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        height: 45,
+                                                        width: 45,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(50),
+                                                          image: const DecorationImage(
+                                                            image: AssetImage("assets/images/profile.png"),
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        ),
+
+                                                      ),
+                                                      Text(" ${story.username} ", style: TextStyle(fontWeight: FontWeight.bold),),
+                                                      Image.asset("assets/icons/verified.png", height: 15, width: 15,),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  flex: 4,
+                                                  child: Text(timeAgoSinceDate(DateTime.fromMillisecondsSinceEpoch(story.time).toString()), textAlign: TextAlign.right, style: TextStyle(fontWeight: FontWeight.bold),),
+                                                )
+
+                                              ],
+                                            ),
+                                            SizedBox(height: 10,),
+                                            Container(
+                                              height: _size.width> 756 ? 400 : 200, //height of TabBarView
+                                              width: width*0.9,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(15),
+                                                image: DecorationImage(
+                                                  image: NetworkImage(
+                                                    story.image
+                                                  ),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+
+                                            ),
+                                            SizedBox(height: 10,),
+                                            Text(story.title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),),
+
+                                            SizedBox(height: 10,),
+                                            InkWell(
+                                              onTap: (){
+                                                Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => PostDetail(post: story,)));
+                                              },
+                                              child: Container(
+                                                height: 30,
+                                                width: width*0.15,
+                                                decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    border: Border.all(color: colorBlack)
+                                                ),
+                                                alignment: Alignment.center,
+                                                child: const Text("leer",style: TextStyle(fontSize:18,color: colorBlack),),
+                                              ),
+                                            ),
+                                            SizedBox(height: 40,),
+
+                                            Row(
+                                              mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.thumb_up_alt_outlined),
+                                                    SizedBox(width: 5,),
+                                                    Text("0", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.arrow_upward),
+                                                    Icon(Icons.arrow_downward),
+                                                    SizedBox(width: 5,),
+                                                    Text("Votar 0", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.comment),
+                                                    SizedBox(width: 5,),
+                                                    Text(story.comments.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                  ],
+                                                ),
+                                                Icon(Icons.share),
+
+                                              ],
+                                            )
+
                                           ],
                                         ),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.arrow_upward),
-                                            Icon(Icons.arrow_downward),
-                                            SizedBox(width: 5,),
-                                            Text("Votar", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.comment),
-                                            SizedBox(width: 5,),
-                                            Text("76", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                          ],
-                                        ),
-                                        Icon(Icons.share),
-
-                                      ],
-                                    )
-
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 20,),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 6,
-                                          child: Row(
-                                            children: [
-                                              Image.asset("assets/icons/eu-news.png", height: 45, width: 45,),
-                                              Text(" E.U News ", style: TextStyle(fontWeight: FontWeight.bold),),
-                                              Image.asset("assets/icons/verified.png", height: 15, width: 15,),
-                                            ],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 4,
-                                          child: Text("11:45 AM", textAlign: TextAlign.right, style: TextStyle(fontWeight: FontWeight.bold),),
-                                        )
-
-                                      ],
-                                    ),
-                                    SizedBox(height: 10,),
-                                    Container(
-                                      height: _size.width> 756 ? 400 : 200, //height of TabBarView
-                                      width: width*0.9,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(15),
-                                        image: DecorationImage(
-                                          image: AssetImage("assets/images/car.png"),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-
-                                    ),
-                                    SizedBox(height: 10,),
-                                    Text("El presidente Hernández visita la UE", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),),
-
-                                    SizedBox(height: 10,),
-                                    InkWell(
-                                      onTap: (){
-                                        Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => PostDetail()));
-                                      },
-                                      child: Container(
-                                        height: 30,
-                                        width: width*0.15,
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
-                                            border: Border.all(color: colorBlack)
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: const Text("leer",style: TextStyle(fontSize:18,color: colorBlack),),
-                                      ),
-                                    ),
-                                    SizedBox(height: 40,),
-
-                                    Row(
-                                      mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Icon(Icons.thumb_up_alt_outlined),
-                                            SizedBox(width: 5,),
-                                            Text("98", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.arrow_upward),
-                                            Icon(Icons.arrow_downward),
-                                            SizedBox(width: 5,),
-                                            Text("Votar", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.comment),
-                                            SizedBox(width: 5,),
-                                            Text("76", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                          ],
-                                        ),
-                                        Icon(Icons.share),
-
-                                      ],
-                                    )
-
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 20,),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 6,
-                                          child: Row(
-                                            children: [
-                                              Image.asset("assets/icons/eu-news.png", height: 45, width: 45,),
-                                              Text(" E.U News ", style: TextStyle(fontWeight: FontWeight.bold),),
-                                              Image.asset("assets/icons/verified.png", height: 15, width: 15,),
-                                            ],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 4,
-                                          child: Text("11:45 AM", textAlign: TextAlign.right, style: TextStyle(fontWeight: FontWeight.bold),),
-                                        )
-
-                                      ],
-                                    ),
-                                    SizedBox(height: 10,),
-                                    Container(
-                                      height: _size.width> 756 ? 400 : 200, //height of TabBarView
-                                      width: width*0.9,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(15),
-                                        image: DecorationImage(
-                                          image: AssetImage("assets/images/car.png"),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-
-                                    ),
-                                    SizedBox(height: 10,),
-                                    Text("El presidente Hernández visita la UE", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),),
-
-                                    SizedBox(height: 10,),
-                                    InkWell(
-                                      onTap: (){
-                                        Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => PostDetail()));
-                                      },
-                                      child: Container(
-                                        height: 30,
-                                        width: width*0.15,
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
-                                            border: Border.all(color: colorBlack)
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: const Text("leer",style: TextStyle(fontSize:18,color: colorBlack),),
-                                      ),
-                                    ),
-                                    SizedBox(height: 40,),
-
-                                    Row(
-                                      mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Icon(Icons.thumb_up_alt_outlined),
-                                            SizedBox(width: 5,),
-                                            Text("98", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.arrow_upward),
-                                            Icon(Icons.arrow_downward),
-                                            SizedBox(width: 5,),
-                                            Text("Votar", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.comment),
-                                            SizedBox(width: 5,),
-                                            Text("76", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                          ],
-                                        ),
-                                        Icon(Icons.share),
-
-                                      ],
-                                    )
-
-                                  ],
-                                ),
+                                      );
+                                    }).toList(),
+                                  );
+                                },
                               ),
                               SizedBox(height: 50,)
                             ],
                           ),
                         ),
                         Container(
-                          child: Center(
-                            child: Text('Pestaña 2', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                          child: ListView(
+                            children: [
+                              StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance.collection('posts')
+                                    .snapshots(),
+                                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Center(child: Text('Something went wrong'));
+                                  }
+
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+                                  if (snapshot.data!.size==0) {
+                                    return Center(child: Text('Sin publicaciones'));
+                                  }
+                                  return ListView(
+                                    shrinkWrap: true,
+                                    padding: EdgeInsets.all(20),
+
+                                    children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                                      Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+                                      PostModel story=PostModel.fromMap(data, document.reference.id);
+
+                                      return Container(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(height: 20,),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  flex: 6,
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        height: 45,
+                                                        width: 45,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(50),
+                                                          image: const DecorationImage(
+                                                            image: AssetImage("assets/images/profile.png"),
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        ),
+
+                                                      ),
+                                                      Text(" ${story.username} ", style: TextStyle(fontWeight: FontWeight.bold),),
+                                                      Image.asset("assets/icons/verified.png", height: 15, width: 15,),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  flex: 4,
+                                                  child: Text(timeAgoSinceDate(DateTime.fromMillisecondsSinceEpoch(story.time).toString()), textAlign: TextAlign.right, style: TextStyle(fontWeight: FontWeight.bold),),
+                                                )
+
+                                              ],
+                                            ),
+                                            SizedBox(height: 10,),
+                                            Container(
+                                              height: _size.width> 756 ? 400 : 200, //height of TabBarView
+                                              width: width*0.9,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(15),
+                                                image: DecorationImage(
+                                                  image: NetworkImage(
+                                                      story.image
+                                                  ),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+
+                                            ),
+                                            SizedBox(height: 10,),
+                                            Text(story.title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),),
+
+                                            SizedBox(height: 10,),
+                                            InkWell(
+                                              onTap: (){
+                                                Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => PostDetail(post: story,)));
+                                              },
+                                              child: Container(
+                                                height: 30,
+                                                width: width*0.15,
+                                                decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    border: Border.all(color: colorBlack)
+                                                ),
+                                                alignment: Alignment.center,
+                                                child: const Text("leer",style: TextStyle(fontSize:18,color: colorBlack),),
+                                              ),
+                                            ),
+                                            SizedBox(height: 40,),
+
+                                            Row(
+                                              mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.thumb_up_alt_outlined),
+                                                    SizedBox(width: 5,),
+                                                    Text("0", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.arrow_upward),
+                                                    Icon(Icons.arrow_downward),
+                                                    SizedBox(width: 5,),
+                                                    Text("Votar 0", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.comment),
+                                                    SizedBox(width: 5,),
+                                                    Text(story.comments.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                  ],
+                                                ),
+                                                Icon(Icons.share),
+
+                                              ],
+                                            )
+
+                                          ],
+                                        ),
+                                      );
+                                    }).toList(),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 50,)
+                            ],
                           ),
                         ),
                         Container(
-                          child: Center(
-                            child: Text('Pestaña 3', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                          child: ListView(
+                            children: [
+                              StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance.collection('posts')
+                                    .where("categoryName",isEqualTo: "Deportes").snapshots(),
+                                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Center(child: Text('Something went wrong'));
+                                  }
+
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+                                  if (snapshot.data!.size==0) {
+                                    return const Center(child: Padding(
+                                      padding: EdgeInsets.symmetric(vertical: 50.0),
+                                      child: Text('Sin publicaciones'),
+                                    ));
+                                  }
+                                  return ListView(
+                                    shrinkWrap: true,
+                                    padding: EdgeInsets.all(20),
+
+                                    children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                                      Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+                                      PostModel story=PostModel.fromMap(data, document.reference.id);
+
+                                      return Container(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(height: 20,),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  flex: 6,
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        height: 45,
+                                                        width: 45,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(50),
+                                                          image: const DecorationImage(
+                                                            image: AssetImage("assets/images/profile.png"),
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        ),
+
+                                                      ),
+                                                      Text(" ${story.username} ", style: TextStyle(fontWeight: FontWeight.bold),),
+                                                      Image.asset("assets/icons/verified.png", height: 15, width: 15,),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  flex: 4,
+                                                  child: Text(timeAgoSinceDate(DateTime.fromMillisecondsSinceEpoch(story.time).toString()), textAlign: TextAlign.right, style: TextStyle(fontWeight: FontWeight.bold),),
+                                                )
+
+                                              ],
+                                            ),
+                                            SizedBox(height: 10,),
+                                            Container(
+                                              height: _size.width> 756 ? 400 : 200, //height of TabBarView
+                                              width: width*0.9,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(15),
+                                                image: DecorationImage(
+                                                  image: NetworkImage(
+                                                      story.image
+                                                  ),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+
+                                            ),
+                                            SizedBox(height: 10,),
+                                            Text(story.title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),),
+
+                                            SizedBox(height: 10,),
+                                            InkWell(
+                                              onTap: (){
+                                                Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => PostDetail(post: story,)));
+                                              },
+                                              child: Container(
+                                                height: 30,
+                                                width: width*0.15,
+                                                decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    border: Border.all(color: colorBlack)
+                                                ),
+                                                alignment: Alignment.center,
+                                                child: const Text("leer",style: TextStyle(fontSize:18,color: colorBlack),),
+                                              ),
+                                            ),
+                                            SizedBox(height: 40,),
+
+                                            Row(
+                                              mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.thumb_up_alt_outlined),
+                                                    SizedBox(width: 5,),
+                                                    Text("0", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.arrow_upward),
+                                                    Icon(Icons.arrow_downward),
+                                                    SizedBox(width: 5,),
+                                                    Text("Votar 0", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.comment),
+                                                    SizedBox(width: 5,),
+                                                    Text(story.comments.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                  ],
+                                                ),
+                                                Icon(Icons.share),
+
+                                              ],
+                                            )
+
+                                          ],
+                                        ),
+                                      );
+                                    }).toList(),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 50,)
+                            ],
                           ),
                         ),
                         Container(
-                          child: Center(
-                            child: Text('Pestaña 4', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                          child: ListView(
+                            children: [
+                              StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance.collection('posts')
+                                    .where("categoryName",isEqualTo: "Politics").snapshots(),
+                                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Center(child: Text('Something went wrong'));
+                                  }
+
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+                                  if (snapshot.data!.size==0) {
+                                    return Center(child: Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 50.0),
+                                      child: Text('Sin publicaciones'),
+                                    ));
+                                  }
+                                  return ListView(
+                                    shrinkWrap: true,
+                                    padding: EdgeInsets.all(20),
+
+                                    children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                                      Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+                                      PostModel story=PostModel.fromMap(data, document.reference.id);
+
+                                      return Container(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(height: 20,),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  flex: 6,
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        height: 45,
+                                                        width: 45,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(50),
+                                                          image: const DecorationImage(
+                                                            image: AssetImage("assets/images/profile.png"),
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        ),
+
+                                                      ),
+                                                      Text(" ${story.username} ", style: TextStyle(fontWeight: FontWeight.bold),),
+                                                      Image.asset("assets/icons/verified.png", height: 15, width: 15,),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  flex: 4,
+                                                  child: Text(timeAgoSinceDate(DateTime.fromMillisecondsSinceEpoch(story.time).toString()), textAlign: TextAlign.right, style: TextStyle(fontWeight: FontWeight.bold),),
+                                                )
+
+                                              ],
+                                            ),
+                                            SizedBox(height: 10,),
+                                            Container(
+                                              height: _size.width> 756 ? 400 : 200, //height of TabBarView
+                                              width: width*0.9,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(15),
+                                                image: DecorationImage(
+                                                  image: NetworkImage(
+                                                      story.image
+                                                  ),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+
+                                            ),
+                                            SizedBox(height: 10,),
+                                            Text(story.title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),),
+
+                                            SizedBox(height: 10,),
+                                            InkWell(
+                                              onTap: (){
+                                                Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => PostDetail(post: story,)));
+                                              },
+                                              child: Container(
+                                                height: 30,
+                                                width: width*0.15,
+                                                decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    border: Border.all(color: colorBlack)
+                                                ),
+                                                alignment: Alignment.center,
+                                                child: const Text("leer",style: TextStyle(fontSize:18,color: colorBlack),),
+                                              ),
+                                            ),
+                                            SizedBox(height: 40,),
+
+                                            Row(
+                                              mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.thumb_up_alt_outlined),
+                                                    SizedBox(width: 5,),
+                                                    Text("0", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.arrow_upward),
+                                                    Icon(Icons.arrow_downward),
+                                                    SizedBox(width: 5,),
+                                                    Text("Votar 0", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.comment),
+                                                    SizedBox(width: 5,),
+                                                    Text(story.comments.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                  ],
+                                                ),
+                                                Icon(Icons.share),
+
+                                              ],
+                                            )
+
+                                          ],
+                                        ),
+                                      );
+                                    }).toList(),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 50,)
+                            ],
                           ),
                         ),
                       ])
