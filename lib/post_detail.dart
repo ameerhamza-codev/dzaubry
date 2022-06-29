@@ -1,12 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dzaubry_newspaper/models/post_model.dart';
-import 'package:dzaubry_newspaper/navbar%20screens/profile.dart';
-import 'package:dzaubry_newspaper/navbar%20screens/sidemenu.dart';
-import 'package:dzaubry_newspaper/provider/userdataprovider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
 import '../utils/constants.dart';
 
 class PostDetail extends StatefulWidget {
@@ -34,15 +29,7 @@ class _PostDetailState extends State<PostDetail> {
         elevation: 0,
         iconTheme: IconThemeData(color: primaryColor),
         actions: <Widget>[
-          // IconButton(
-          //   icon: const Icon(Icons.add_circle),
-          //   tooltip: 'Show Snackbar',
-          //   onPressed: () {
-          //     ScaffoldMessenger.of(context).showSnackBar(
-          //         const SnackBar(content: Text('This is a snackbar')));
-          //     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => BottomNavBar()));
-          //   },
-          // ),
+
         ],
       ),
       body: Padding(
@@ -115,13 +102,28 @@ class _PostDetailState extends State<PostDetail> {
                             Text(timeAgoSinceDate(DateTime.fromMillisecondsSinceEpoch(widget.post.time).toString()), textAlign: TextAlign.left, style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),),
                             SizedBox(height: 10,),
 
+                            widget.post.image=="" ?
                             Container(
                               height: _size.width> 756 ? 400 : 200, //height of TabBarView
                               width: width*0.9,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(15),
+                                image: const DecorationImage(
+                                  image: AssetImage("assets/images/no_image.png"),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+
+                            )
+                                : Container(
+                              height: _size.width> 756 ? 400 : 200, //height of TabBarView
+                              width: width*0.9,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
                                 image: DecorationImage(
-                                  image: NetworkImage(widget.post.image),
+                                  image: NetworkImage(
+                                      widget.post.image
+                                  ),
                                   fit: BoxFit.cover,
                                 ),
                               ),

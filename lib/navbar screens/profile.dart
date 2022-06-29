@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:sn_progress_dialog/progress_dialog.dart';
 
 import '../provider/userdataprovider.dart';
 import '../utils/constants.dart';
@@ -18,39 +19,156 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+
+  final TextEditingController _newPasswordController = TextEditingController();
+  final _newPassKey = GlobalKey<FormState>();
+  final _editProfileKey = GlobalKey<FormState>();
+
+
+  void _changePassword(String newPassword) async {
+
+    final provider = Provider.of<UserDataProvider>(context, listen: false);
+    final user = await FirebaseAuth.instance.currentUser;
+    final cred = EmailAuthProvider.credential(
+        email: provider.userData!.email, password: provider.userData!.password);
+
+    user?.reauthenticateWithCredential(cred).then((value) {
+      user.updatePassword(newPassword).then((_) async {
+        //Success, do something
+        FirebaseFirestore.instance.collection('users').doc(provider.userData!.userId).update({
+          'password': newPassword,
+        });
+        await FirebaseAuth.instance.signOut();
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => Login()));
+        const snackBar = SnackBar(
+          content: Text('Contraseña cambiada con éxito.'),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+      }).catchError((error) {
+        CoolAlert.show(
+          context: context,
+          type: CoolAlertType.error,
+          text: error.toString(),
+        );
+      });
+    }).catchError((err) {
+      CoolAlert.show(
+        context: context,
+        type: CoolAlertType.error,
+        text: err.toString(),
+      );
+    });}
+
+  Future<void> _displayChangePasswordDialog(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Cambia la contraseña'),
+            content: Form(
+              key: _newPassKey,
+              child: TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Ingrese nueva clave';
+                  }
+                  return null;
+                },
+                controller: _newPasswordController,
+                decoration: InputDecoration(hintText: "Nueva contraseña"),
+              ),
+            ),
+            actions: <Widget>[
+              ElevatedButton(
+                child: Text('Cancelar'),
+                onPressed: () {
+                  setState(() {
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+              ElevatedButton(
+                child: Text('Hecho'),
+                onPressed: () {
+                  setState(() {
+                    if(_newPassKey.currentState!.validate()) {
+                      _changePassword(_newPasswordController.text);
+                      Navigator.pop(context);
+                    }
+                  });
+                },
+              ),
+            ],
+          );
+        });
+  }
+  Future<void> _displayEditProfileDialog(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Editar perfil'),
+            content: Form(
+              key: _editProfileKey,
+              child: Column(
+                children: [
+
+                  SizedBox(height: 30,),
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Ingrese nueva clave';
+                      }
+                      return null;
+                    },
+                    controller: _newPasswordController,
+                    decoration: InputDecoration(hintText: "Nueva contraseña"),
+                  ),
+                  SizedBox(height: 10,),
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Ingrese nueva clave';
+                      }
+                      return null;
+                    },
+                    controller: _newPasswordController,
+                    decoration: InputDecoration(hintText: "Nueva contraseña"),
+                  ),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              ElevatedButton(
+                child: Text('Cancelar'),
+                onPressed: () {
+                  setState(() {
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+              ElevatedButton(
+                child: Text('Hecho'),
+                onPressed: () {
+                  setState(() {
+                    if(_editProfileKey.currentState!.validate()) {
+                      Navigator.pop(context);
+                    }
+                  });
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     Size size= MediaQuery.of(context).size;
     final provider = Provider.of<UserDataProvider>(context, listen: false);
-
-    //change password
-    void _changePassword(String currentPassword, String newPassword) async {
-      final user = await FirebaseAuth.instance.currentUser;
-      final cred = EmailAuthProvider.credential(
-          email: provider.userData!.email, password: currentPassword);
-
-      user?.reauthenticateWithCredential(cred).then((value) {
-        user.updatePassword(newPassword).then((_) {
-          CoolAlert.show(
-            context: context,
-            type: CoolAlertType.success,
-            text: "Password Changed Successfully",
-          );
-        }).catchError((error) {
-          CoolAlert.show(
-            context: context,
-            type: CoolAlertType.error,
-            text: error.toString(),
-          );
-        });
-      }).catchError((err) {
-        CoolAlert.show(
-          context: context,
-          type: CoolAlertType.error,
-          text: err.toString(),
-        );
-      });}
 
     //get publication
     Future<int> getPublications()async{
@@ -75,15 +193,6 @@ class _ProfileState extends State<Profile> {
         elevation: 0,
         iconTheme: IconThemeData(color: primaryColor),
         actions: const <Widget>[
-          // IconButton(
-          //   icon: const Icon(Icons.add_circle),
-          //   tooltip: 'Show Snackbar',
-          //   onPressed: () {
-          //     ScaffoldMessenger.of(context).showSnackBar(
-          //         const SnackBar(content: Text('This is a snackbar')));
-          //     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => BottomNavBar()));
-          //   },
-          // ),
         ],
       ),
       body: Padding(
@@ -93,7 +202,7 @@ class _ProfileState extends State<Profile> {
             Column(
               children: [
                 SizedBox(height: 10,),
-                Text("Mi Perfil", style: TextStyle(color: colorBlack, fontSize: 20, fontWeight: FontWeight.w600),),
+                const Text("Mi Perfil", style: TextStyle(color: colorBlack, fontSize: 20, fontWeight: FontWeight.w600),),
                 SizedBox(height: 20,),
                 Container(
                   height: 150,
@@ -101,7 +210,7 @@ class _ProfileState extends State<Profile> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
                     image: DecorationImage(
-                      image: AssetImage("assets/images/profile.png"),
+                      image: NetworkImage(provider.userData!.profilePic),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -242,7 +351,9 @@ class _ProfileState extends State<Profile> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(" Cartas credenciales",style: TextStyle(fontSize:16, fontWeight:FontWeight.w500, color: colorBlack),),
-                  Icon(Icons.edit, color: primaryColor,)
+                  InkWell(onTap:(){
+                    _displayChangePasswordDialog(context);
+                  }, child: Icon(Icons.edit, color: primaryColor,))
                 ],
               ),
             ),

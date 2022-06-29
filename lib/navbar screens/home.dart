@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dzaubry_newspaper/models/post_model.dart';
 import 'package:dzaubry_newspaper/navbar%20screens/sidemenu.dart';
 import 'package:dzaubry_newspaper/post_detail.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -22,7 +23,6 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     Size _size= MediaQuery.of(context).size;
-    final provider = Provider.of<UserDataProvider>(context, listen: false);
 
     return Scaffold(
       backgroundColor: colorWhite,
@@ -128,8 +128,8 @@ class _HomeState extends State<Home> {
                                                         width: 45,
                                                         decoration: BoxDecoration(
                                                           borderRadius: BorderRadius.circular(50),
-                                                          image: const DecorationImage(
-                                                            image: AssetImage("assets/images/profile.png"),
+                                                          image: DecorationImage(
+                                                            image: NetworkImage(story.userPic),
                                                             fit: BoxFit.cover,
                                                           ),
                                                         ),
@@ -148,7 +148,20 @@ class _HomeState extends State<Home> {
                                               ],
                                             ),
                                             SizedBox(height: 10,),
+                                            story.image=="" ?
                                             Container(
+                                              height: _size.width> 756 ? 400 : 200, //height of TabBarView
+                                              width: width*0.9,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(15),
+                                                image: const DecorationImage(
+                                                  image: AssetImage("assets/images/no_image.png"),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+
+                                            )
+                                            : Container(
                                               height: _size.width> 756 ? 400 : 200, //height of TabBarView
                                               width: width*0.9,
                                               decoration: BoxDecoration(
@@ -183,35 +196,90 @@ class _HomeState extends State<Home> {
                                             ),
                                             SizedBox(height: 40,),
 
-                                            Row(
-                                              mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Icon(Icons.thumb_up_alt_outlined),
-                                                    SizedBox(width: 5,),
-                                                    Text("0", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Icon(Icons.arrow_upward),
-                                                    Icon(Icons.arrow_downward),
-                                                    SizedBox(width: 5,),
-                                                    Text("Votar 0", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Icon(Icons.comment),
-                                                    SizedBox(width: 5,),
-                                                    Text(story.comments.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                                  ],
-                                                ),
-                                                Icon(Icons.share),
+                                            StreamBuilder<QuerySnapshot>(
+                                                stream: FirebaseFirestore.instance.collection('posts').where("story",isEqualTo: story.story).snapshots(),
+                                                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                                                  if (snapshot.hasError) {
+                                                    return const Center(child: Text('Something went wrong'));
+                                                  }
+                                                  return Row(
+                                                    mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          IconButton(
+                                                            icon: Icon(Icons.thumb_up_alt_outlined),
+                                                            onPressed: (){
+                                                              if(!story.like.contains(FirebaseAuth.instance.currentUser!.uid)){
+                                                                if(story.dislike.contains(FirebaseAuth.instance.currentUser!.uid)){
+                                                                  List newRemoved=story.dislike;
+                                                                  List newAdd=story.like;
+                                                                  newRemoved.removeWhere((element) => element==FirebaseAuth.instance.currentUser!.uid);
+                                                                  newAdd.add(FirebaseAuth.instance.currentUser!.uid);
+                                                                  FirebaseFirestore.instance.collection('posts').doc(story.id).update({
+                                                                    'like': newAdd,
+                                                                    'dislike': newRemoved,
+                                                                  });
+                                                                }
+                                                                else{
+                                                                  List newAdd=story.like;
 
-                                              ],
-                                            )
+                                                                  newAdd.add(FirebaseAuth.instance.currentUser!.uid);
+                                                                  FirebaseFirestore.instance.collection('posts').doc(story.id).update({
+                                                                    'like': newAdd,
+                                                                  });
+                                                                }
+                                                              }
+                                                            },
+                                                          ),
+                                                          SizedBox(width: 5,),
+                                                          Text(story.like.length.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                        ],
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          IconButton(
+                                                            icon: Icon(Icons.thumb_down_alt_outlined),
+                                                            onPressed: (){
+                                                              if(!story.dislike.contains(FirebaseAuth.instance.currentUser!.uid)){
+                                                                if(story.like.contains(FirebaseAuth.instance.currentUser!.uid)){
+                                                                  List newRemoved=story.like;
+                                                                  List newAdd=story.dislike;
+                                                                  newRemoved.removeWhere((element) => element==FirebaseAuth.instance.currentUser!.uid);
+                                                                  newAdd.add(FirebaseAuth.instance.currentUser!.uid);
+                                                                  FirebaseFirestore.instance.collection('posts').doc(story.id).update({
+                                                                    'dislike': newAdd,
+                                                                    'like': newRemoved,
+                                                                  });
+                                                                }
+                                                                else{
+                                                                  List newAdd=story.dislike;
+
+                                                                  newAdd.add(FirebaseAuth.instance.currentUser!.uid);
+                                                                  FirebaseFirestore.instance.collection('posts').doc(story.id).update({
+                                                                    'dislike': newAdd,
+                                                                  });
+                                                                }
+                                                              }
+                                                            },
+                                                          ),
+                                                          SizedBox(width: 5,),
+                                                          Text(story.dislike.length.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                        ],
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Icon(Icons.comment),
+                                                          SizedBox(width: 5,),
+                                                          Text(story.comments.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                        ],
+                                                      ),
+                                                      Icon(Icons.share),
+
+                                                    ],
+                                                  );
+                                                }
+                                            ),
 
                                           ],
                                         ),
@@ -267,8 +335,8 @@ class _HomeState extends State<Home> {
                                                         width: 45,
                                                         decoration: BoxDecoration(
                                                           borderRadius: BorderRadius.circular(50),
-                                                          image: const DecorationImage(
-                                                            image: AssetImage("assets/images/profile.png"),
+                                                          image: DecorationImage(
+                                                            image: NetworkImage(story.userPic),
                                                             fit: BoxFit.cover,
                                                           ),
                                                         ),
@@ -287,7 +355,20 @@ class _HomeState extends State<Home> {
                                               ],
                                             ),
                                             SizedBox(height: 10,),
+                                            story.image=="" ?
                                             Container(
+                                              height: _size.width> 756 ? 400 : 200, //height of TabBarView
+                                              width: width*0.9,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(15),
+                                                image: const DecorationImage(
+                                                  image: AssetImage("assets/images/no_image.png"),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+
+                                            )
+                                                : Container(
                                               height: _size.width> 756 ? 400 : 200, //height of TabBarView
                                               width: width*0.9,
                                               decoration: BoxDecoration(
@@ -322,35 +403,90 @@ class _HomeState extends State<Home> {
                                             ),
                                             SizedBox(height: 40,),
 
-                                            Row(
-                                              mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Icon(Icons.thumb_up_alt_outlined),
-                                                    SizedBox(width: 5,),
-                                                    Text("0", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Icon(Icons.arrow_upward),
-                                                    Icon(Icons.arrow_downward),
-                                                    SizedBox(width: 5,),
-                                                    Text("Votar 0", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Icon(Icons.comment),
-                                                    SizedBox(width: 5,),
-                                                    Text(story.comments.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                                  ],
-                                                ),
-                                                Icon(Icons.share),
+                                            StreamBuilder<QuerySnapshot>(
+                                                stream: FirebaseFirestore.instance.collection('posts').where("story",isEqualTo: story.story).snapshots(),
+                                                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                                                  if (snapshot.hasError) {
+                                                    return const Center(child: Text('Something went wrong'));
+                                                  }
+                                                  return Row(
+                                                    mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          IconButton(
+                                                            icon: Icon(Icons.thumb_up_alt_outlined),
+                                                            onPressed: (){
+                                                              if(!story.like.contains(FirebaseAuth.instance.currentUser!.uid)){
+                                                                if(story.dislike.contains(FirebaseAuth.instance.currentUser!.uid)){
+                                                                  List newRemoved=story.dislike;
+                                                                  List newAdd=story.like;
+                                                                  newRemoved.removeWhere((element) => element==FirebaseAuth.instance.currentUser!.uid);
+                                                                  newAdd.add(FirebaseAuth.instance.currentUser!.uid);
+                                                                  FirebaseFirestore.instance.collection('posts').doc(story.id).update({
+                                                                    'like': newAdd,
+                                                                    'dislike': newRemoved,
+                                                                  });
+                                                                }
+                                                                else{
+                                                                  List newAdd=story.like;
 
-                                              ],
-                                            )
+                                                                  newAdd.add(FirebaseAuth.instance.currentUser!.uid);
+                                                                  FirebaseFirestore.instance.collection('posts').doc(story.id).update({
+                                                                    'like': newAdd,
+                                                                  });
+                                                                }
+                                                              }
+                                                            },
+                                                          ),
+                                                          SizedBox(width: 5,),
+                                                          Text(story.like.length.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                        ],
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          IconButton(
+                                                            icon: Icon(Icons.thumb_down_alt_outlined),
+                                                            onPressed: (){
+                                                              if(!story.dislike.contains(FirebaseAuth.instance.currentUser!.uid)){
+                                                                if(story.like.contains(FirebaseAuth.instance.currentUser!.uid)){
+                                                                  List newRemoved=story.like;
+                                                                  List newAdd=story.dislike;
+                                                                  newRemoved.removeWhere((element) => element==FirebaseAuth.instance.currentUser!.uid);
+                                                                  newAdd.add(FirebaseAuth.instance.currentUser!.uid);
+                                                                  FirebaseFirestore.instance.collection('posts').doc(story.id).update({
+                                                                    'dislike': newAdd,
+                                                                    'like': newRemoved,
+                                                                  });
+                                                                }
+                                                                else{
+                                                                  List newAdd=story.dislike;
+
+                                                                  newAdd.add(FirebaseAuth.instance.currentUser!.uid);
+                                                                  FirebaseFirestore.instance.collection('posts').doc(story.id).update({
+                                                                    'dislike': newAdd,
+                                                                  });
+                                                                }
+                                                              }
+                                                            },
+                                                          ),
+                                                          SizedBox(width: 5,),
+                                                          Text(story.dislike.length.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                        ],
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Icon(Icons.comment),
+                                                          SizedBox(width: 5,),
+                                                          Text(story.comments.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                        ],
+                                                      ),
+                                                      Icon(Icons.share),
+
+                                                    ],
+                                                  );
+                                                }
+                                            ),
 
                                           ],
                                         ),
@@ -409,8 +545,8 @@ class _HomeState extends State<Home> {
                                                         width: 45,
                                                         decoration: BoxDecoration(
                                                           borderRadius: BorderRadius.circular(50),
-                                                          image: const DecorationImage(
-                                                            image: AssetImage("assets/images/profile.png"),
+                                                          image: DecorationImage(
+                                                            image: NetworkImage(story.userPic),
                                                             fit: BoxFit.cover,
                                                           ),
                                                         ),
@@ -429,7 +565,20 @@ class _HomeState extends State<Home> {
                                               ],
                                             ),
                                             SizedBox(height: 10,),
+                                            story.image=="" ?
                                             Container(
+                                              height: _size.width> 756 ? 400 : 200, //height of TabBarView
+                                              width: width*0.9,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(15),
+                                                image: const DecorationImage(
+                                                  image: AssetImage("assets/images/no_image.png"),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+
+                                            )
+                                                : Container(
                                               height: _size.width> 756 ? 400 : 200, //height of TabBarView
                                               width: width*0.9,
                                               decoration: BoxDecoration(
@@ -464,35 +613,90 @@ class _HomeState extends State<Home> {
                                             ),
                                             SizedBox(height: 40,),
 
-                                            Row(
-                                              mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Icon(Icons.thumb_up_alt_outlined),
-                                                    SizedBox(width: 5,),
-                                                    Text("0", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Icon(Icons.arrow_upward),
-                                                    Icon(Icons.arrow_downward),
-                                                    SizedBox(width: 5,),
-                                                    Text("Votar 0", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Icon(Icons.comment),
-                                                    SizedBox(width: 5,),
-                                                    Text(story.comments.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                                  ],
-                                                ),
-                                                Icon(Icons.share),
+                                            StreamBuilder<QuerySnapshot>(
+                                                stream: FirebaseFirestore.instance.collection('posts').where("story",isEqualTo: story.story).snapshots(),
+                                                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                                                  if (snapshot.hasError) {
+                                                    return const Center(child: Text('Something went wrong'));
+                                                  }
+                                                  return Row(
+                                                    mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          IconButton(
+                                                            icon: Icon(Icons.thumb_up_alt_outlined),
+                                                            onPressed: (){
+                                                              if(!story.like.contains(FirebaseAuth.instance.currentUser!.uid)){
+                                                                if(story.dislike.contains(FirebaseAuth.instance.currentUser!.uid)){
+                                                                  List newRemoved=story.dislike;
+                                                                  List newAdd=story.like;
+                                                                  newRemoved.removeWhere((element) => element==FirebaseAuth.instance.currentUser!.uid);
+                                                                  newAdd.add(FirebaseAuth.instance.currentUser!.uid);
+                                                                  FirebaseFirestore.instance.collection('posts').doc(story.id).update({
+                                                                    'like': newAdd,
+                                                                    'dislike': newRemoved,
+                                                                  });
+                                                                }
+                                                                else{
+                                                                  List newAdd=story.like;
 
-                                              ],
-                                            )
+                                                                  newAdd.add(FirebaseAuth.instance.currentUser!.uid);
+                                                                  FirebaseFirestore.instance.collection('posts').doc(story.id).update({
+                                                                    'like': newAdd,
+                                                                  });
+                                                                }
+                                                              }
+                                                            },
+                                                          ),
+                                                          SizedBox(width: 5,),
+                                                          Text(story.like.length.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                        ],
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          IconButton(
+                                                            icon: Icon(Icons.thumb_down_alt_outlined),
+                                                            onPressed: (){
+                                                              if(!story.dislike.contains(FirebaseAuth.instance.currentUser!.uid)){
+                                                                if(story.like.contains(FirebaseAuth.instance.currentUser!.uid)){
+                                                                  List newRemoved=story.like;
+                                                                  List newAdd=story.dislike;
+                                                                  newRemoved.removeWhere((element) => element==FirebaseAuth.instance.currentUser!.uid);
+                                                                  newAdd.add(FirebaseAuth.instance.currentUser!.uid);
+                                                                  FirebaseFirestore.instance.collection('posts').doc(story.id).update({
+                                                                    'dislike': newAdd,
+                                                                    'like': newRemoved,
+                                                                  });
+                                                                }
+                                                                else{
+                                                                  List newAdd=story.dislike;
+
+                                                                  newAdd.add(FirebaseAuth.instance.currentUser!.uid);
+                                                                  FirebaseFirestore.instance.collection('posts').doc(story.id).update({
+                                                                    'dislike': newAdd,
+                                                                  });
+                                                                }
+                                                              }
+                                                            },
+                                                          ),
+                                                          SizedBox(width: 5,),
+                                                          Text(story.dislike.length.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                        ],
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Icon(Icons.comment),
+                                                          SizedBox(width: 5,),
+                                                          Text(story.comments.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                        ],
+                                                      ),
+                                                      Icon(Icons.share),
+
+                                                    ],
+                                                  );
+                                                }
+                                            ),
 
                                           ],
                                         ),
@@ -551,8 +755,8 @@ class _HomeState extends State<Home> {
                                                         width: 45,
                                                         decoration: BoxDecoration(
                                                           borderRadius: BorderRadius.circular(50),
-                                                          image: const DecorationImage(
-                                                            image: AssetImage("assets/images/profile.png"),
+                                                          image: DecorationImage(
+                                                            image: NetworkImage(story.userPic),
                                                             fit: BoxFit.cover,
                                                           ),
                                                         ),
@@ -571,7 +775,20 @@ class _HomeState extends State<Home> {
                                               ],
                                             ),
                                             SizedBox(height: 10,),
+                                            story.image=="" ?
                                             Container(
+                                              height: _size.width> 756 ? 400 : 200, //height of TabBarView
+                                              width: width*0.9,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(15),
+                                                image: const DecorationImage(
+                                                  image: AssetImage("assets/images/no_image.png"),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+
+                                            )
+                                                : Container(
                                               height: _size.width> 756 ? 400 : 200, //height of TabBarView
                                               width: width*0.9,
                                               decoration: BoxDecoration(
@@ -606,35 +823,90 @@ class _HomeState extends State<Home> {
                                             ),
                                             SizedBox(height: 40,),
 
-                                            Row(
-                                              mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Icon(Icons.thumb_up_alt_outlined),
-                                                    SizedBox(width: 5,),
-                                                    Text("0", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Icon(Icons.arrow_upward),
-                                                    Icon(Icons.arrow_downward),
-                                                    SizedBox(width: 5,),
-                                                    Text("Votar 0", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Icon(Icons.comment),
-                                                    SizedBox(width: 5,),
-                                                    Text(story.comments.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
-                                                  ],
-                                                ),
-                                                Icon(Icons.share),
+                                            StreamBuilder<QuerySnapshot>(
+                                                stream: FirebaseFirestore.instance.collection('posts').where("story",isEqualTo: story.story).snapshots(),
+                                                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                                                  if (snapshot.hasError) {
+                                                    return const Center(child: Text('Something went wrong'));
+                                                  }
+                                                  return Row(
+                                                    mainAxisAlignment: _size.width> 756 ? MainAxisAlignment.spaceAround: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          IconButton(
+                                                            icon: Icon(Icons.thumb_up_alt_outlined),
+                                                            onPressed: (){
+                                                              if(!story.like.contains(FirebaseAuth.instance.currentUser!.uid)){
+                                                                if(story.dislike.contains(FirebaseAuth.instance.currentUser!.uid)){
+                                                                  List newRemoved=story.dislike;
+                                                                  List newAdd=story.like;
+                                                                  newRemoved.removeWhere((element) => element==FirebaseAuth.instance.currentUser!.uid);
+                                                                  newAdd.add(FirebaseAuth.instance.currentUser!.uid);
+                                                                  FirebaseFirestore.instance.collection('posts').doc(story.id).update({
+                                                                    'like': newAdd,
+                                                                    'dislike': newRemoved,
+                                                                  });
+                                                                }
+                                                                else{
+                                                                  List newAdd=story.like;
 
-                                              ],
-                                            )
+                                                                  newAdd.add(FirebaseAuth.instance.currentUser!.uid);
+                                                                  FirebaseFirestore.instance.collection('posts').doc(story.id).update({
+                                                                    'like': newAdd,
+                                                                  });
+                                                                }
+                                                              }
+                                                            },
+                                                          ),
+                                                          SizedBox(width: 5,),
+                                                          Text(story.like.length.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                        ],
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          IconButton(
+                                                            icon: Icon(Icons.thumb_down_alt_outlined),
+                                                            onPressed: (){
+                                                              if(!story.dislike.contains(FirebaseAuth.instance.currentUser!.uid)){
+                                                                if(story.like.contains(FirebaseAuth.instance.currentUser!.uid)){
+                                                                  List newRemoved=story.like;
+                                                                  List newAdd=story.dislike;
+                                                                  newRemoved.removeWhere((element) => element==FirebaseAuth.instance.currentUser!.uid);
+                                                                  newAdd.add(FirebaseAuth.instance.currentUser!.uid);
+                                                                  FirebaseFirestore.instance.collection('posts').doc(story.id).update({
+                                                                    'dislike': newAdd,
+                                                                    'like': newRemoved,
+                                                                  });
+                                                                }
+                                                                else{
+                                                                  List newAdd=story.dislike;
+
+                                                                  newAdd.add(FirebaseAuth.instance.currentUser!.uid);
+                                                                  FirebaseFirestore.instance.collection('posts').doc(story.id).update({
+                                                                    'dislike': newAdd,
+                                                                  });
+                                                                }
+                                                              }
+                                                            },
+                                                          ),
+                                                          SizedBox(width: 5,),
+                                                          Text(story.dislike.length.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                        ],
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Icon(Icons.comment),
+                                                          SizedBox(width: 5,),
+                                                          Text(story.comments.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),)
+                                                        ],
+                                                      ),
+                                                      Icon(Icons.share),
+
+                                                    ],
+                                                  );
+                                                }
+                                            ),
 
                                           ],
                                         ),

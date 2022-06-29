@@ -32,7 +32,7 @@ class _LoginState extends State<Login> {
   //function
   login()async{
     final ProgressDialog pr = ProgressDialog(context: context);
-    pr.show(max: 100, msg: 'Logging In');
+    pr.show(max: 100, msg: 'Iniciando sesión');
     await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text

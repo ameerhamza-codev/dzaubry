@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "752591718124",
+    "project_id": "dzuabry",
+    "storage_bucket": "dzuabry.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:752591718124:android:283aa3b107434a4430c7c9",
+        "android_client_info": {
+          "package_name": "com.codev.dzaubrynewspaper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "752591718124-1243nj0d6oh5l8k71n88u4khf7ecu3f1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCY4Xk788fTvk9DoTTPx2vuNyG1YcbnAkQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "752591718124-1243nj0d6oh5l8k71n88u4khf7ecu3f1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "752591718124-ugim820hpgrmtjkbuubmhcq9cq63j0qa.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.codev.dzaubrynewspaper"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

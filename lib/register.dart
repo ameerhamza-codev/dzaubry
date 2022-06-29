@@ -43,17 +43,19 @@ class _RegisterState extends State<Register> {
         "userName":_usernameController.text,
         "email":_emailController.text,
         "password":_passwordController.text,
+        "profileURL": "https://st3.depositphotos.com/9998432/13335/v/600/depositphotos_133352010-stock-illustration-default-placeholder-man-and-woman.jpg"
 
       });
       final provider = Provider.of<UserDataProvider>(context, listen: false);
 
-      AppUser model=new AppUser(
+      AppUser model= AppUser(
           value.user!.uid,
           _firstNameController.text,
           _lastNameController.text,
           _usernameController.text,
           _emailController.text,
           _passwordController.text,
+          "https://st3.depositphotos.com/9998432/13335/v/600/depositphotos_133352010-stock-illustration-default-placeholder-man-and-woman.jpg"
       );
       provider.setUserData(model);
       // provider.setCategory("All Categories");

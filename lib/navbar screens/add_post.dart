@@ -191,11 +191,11 @@ class _AddPostState extends State<AddPost> {
                     'image': photoUrl,
                     'comments': 0,
                     'like': [],
-                    'voteUp': [],
-                    'voteDown': [],
+                    'dislike': [],
                     'categoryName': category,
                     'userId':FirebaseAuth.instance.currentUser!.uid,
                     'username':provider.userData!.userName,
+                    'userPic' :provider.userData!.profilePic,
                     'time':DateTime.now().millisecondsSinceEpoch
                   }).then((value) {
                     pr.close();

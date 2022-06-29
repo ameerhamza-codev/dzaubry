@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PostModel{
-  String id,username,story,title,image,userId,categoryName;
+  String id,username, userPic,story,title,image,userId,categoryName;
   int time,comments;
   List like,dislike;
 
@@ -11,7 +11,8 @@ class PostModel{
   PostModel.fromMap(Map<String,dynamic> map,String key)
       : id=key,
         username = map['username'],
-        categoryName = map['categoryName']??"",
+        userPic = map['userPic'],
+      categoryName = map['categoryName']??"",
         title = map['title']??"no title",
         story = map['story'],
         image = map['image'],
